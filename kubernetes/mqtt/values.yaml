@@ -1,0 +1,6 @@
+image:
+  name: eclipse-mosquitto
+  registry: registry-1.docker.io
+  tag: latest
+dns:
+  name: cs.calvin.edu

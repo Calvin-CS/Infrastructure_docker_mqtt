@@ -1,0 +1,4 @@
+apiVersion: v2
+name: mqtt
+description: A Helm chart for Kubernetes deployment of eclipse-mosquitto
+version: 0.1.0

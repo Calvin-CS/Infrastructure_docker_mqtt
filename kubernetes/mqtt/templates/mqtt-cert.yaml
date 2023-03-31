@@ -1,0 +1,18 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: tls-secret-mqtt-{{ default "staging" .Release.Namespace }}
+spec:
+  commonName: mqtt{{ if ne .Release.Namespace "production" }}-{{ default "staging" .Release.Namespace }}{{- end }}.{{ .Values.dns.name }}
+  dnsNames:
+  - mqtt{{ if ne .Release.Namespace "production" }}-{{ default "staging" .Release.Namespace }}{{- end }}.{{ .Values.dns.name }}
+  issuerRef:
+    group: cert-manager.io
+    kind: ClusterIssuer
+    name: letsencrypt
+  secretName: tls-secret-mqtt-{{ default "staging" .Release.Namespace }}
+  usages:
+  - digital signature
+  - key encipherment
+  - server auth
+---

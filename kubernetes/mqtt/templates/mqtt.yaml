@@ -1,0 +1,76 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mqtt-{{ default "staging" .Release.Namespace }}
+  namespace: {{ default "staging" .Release.Namespace }}
+  labels:
+    app: mqtt-{{ default "staging" .Release.Namespace }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mqtt-{{ default "staging" .Release.Namespace }}
+      tier: backend
+  template:
+    metadata:
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/mqtt-configmap.yaml") . | sha256sum }}
+        releaseTime: {{ dateInZone "2006-01-02 15:04:05Z" (now) "UTC"| quote }}
+      labels:
+        app: mqtt-{{ default "staging" .Release.Namespace }}
+        tier: backend
+    spec:
+      {{ if ne .Release.Namespace "production" }}hostname: mqtt-{{ .Release.Namespace }}{{- else }}hostname: mqtt{{- end }}
+      dnsPolicy: Default
+      dnsConfig:
+        searches:
+          - cs.calvin.edu
+      # Allow non-root user to access PersistentVolume
+      securityContext:
+        fsGroup: 1000
+      containers:
+      - name: mqtt-{{ default "staging" .Release.Namespace }}
+        image: {{ .Values.image.name }}:{{ default "latest" .Values.image.tag }}
+        ports:
+        - containerPort: 1883
+        - containerPort: 8883
+        - containerPort: 8080
+        - containerPort: 8083
+        resources:
+          requests:
+            memory: "50Mi"
+            cpu: "150m" #0.15 CPU
+          limits:
+            memory: "100Mi"
+            cpu: "350m" #0.35 CPU
+        volumeMounts:
+        - name: tls
+          mountPath: /etc/tls
+          readOnly: true
+        - name: passwd
+          mountPath: /var/secrets
+          readOnly: true
+        - name: mosquittoconfig
+          mountPath: /mosquitto/config
+          readOnly: true
+        - name: mosquittodata
+          mountPath: /mosquitto/data
+      volumes:
+      - name: mosquittodata
+        persistentVolumeClaim:
+          claimName: pvc-mqtt-persistent-data-{{ default "staging" .Release.Namespace }}
+      - name: tls
+        secret:
+          secretName: tls-secret-mqtt-{{ default "staging" .Release.Namespace }}
+      - name: mosquittoconfig
+        configMap:
+          name: mqtt-config-{{ default "staging" .Release.Namespace }}
+          items:
+          - key: mosquittoconfig
+            path: mosquitto.conf
+          - key: tlschain
+            path: chain.pem
+      - name: passwd
+        secret:
+          secretName: mqtt-passwd
+---
