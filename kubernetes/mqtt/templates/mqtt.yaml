@@ -61,7 +61,7 @@ spec:
           claimName: pvc-mqtt-persistent-data-{{ default "staging" .Release.Namespace }}
       - name: tls
         secret:
-          secretName: tls-secret-mqtt-{{ default "staging" .Release.Namespace }}
+          secretName: tls-secret-cert-{{ .Values.dns.hostname }}-{{ default "staging" .Release.Namespace }}
       - name: mosquittoconfig
         configMap:
           name: mqtt-config-{{ default "staging" .Release.Namespace }}

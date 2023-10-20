@@ -1,7 +1,7 @@
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
-  name: tls-secret-mqtt-{{ default "staging" .Release.Namespace }}
+  name: tls-secret-cert-{{ .Values.dns.hostname }}-{{ default "staging" .Release.Namespace }}
 spec:
   commonName: {{ .Values.dns.hostname }}{{ if ne .Release.Namespace "production" }}-{{ default "staging" .Release.Namespace }}{{- end }}.{{ .Values.dns.name }}
   dnsNames:
@@ -10,7 +10,7 @@ spec:
     group: cert-manager.io
     kind: ClusterIssuer
     name: letsencrypt
-  secretName: tls-secret-mqtt-{{ default "staging" .Release.Namespace }}
+  secretName: tls-secret-cert-{{ .Values.dns.hostname }}-{{ default "staging" .Release.Namespace }}
   usages:
   - digital signature
   - key encipherment
