@@ -5,7 +5,7 @@ metadata:
   labels:
     tier: backend
   annotations:
-    "builddate": "20230330-1"
+    "builddate": "20231020-1"
 data:
   tlschain: |
     -----BEGIN CERTIFICATE-----

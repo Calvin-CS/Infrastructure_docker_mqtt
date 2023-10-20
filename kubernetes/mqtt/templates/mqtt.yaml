@@ -20,11 +20,11 @@ spec:
         app: mqtt-{{ default "staging" .Release.Namespace }}
         tier: backend
     spec:
-      {{ if ne .Release.Namespace "production" }}hostname: mqtt-{{ .Release.Namespace }}{{- else }}hostname: mqtt{{- end }}
+      {{ if ne .Release.Namespace "production" }}hostname: {{ .Values.dns.hostname }}-{{ .Release.Namespace }}{{- else }}hostname: {{ .Values.dns.hostname }}{{- end }}
       dnsPolicy: Default
       dnsConfig:
         searches:
-          - cs.calvin.edu
+          - {{ .Values.dns.name }}
       # Allow non-root user to access PersistentVolume
       securityContext:
         fsGroup: 1000

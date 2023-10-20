@@ -4,3 +4,4 @@ image:
   tag: latest
 dns:
   name: cs.calvin.edu
+  hostname: iot
